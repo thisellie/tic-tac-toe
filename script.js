@@ -1,79 +1,81 @@
-const X = 'x'
-const O = 'o'
-const win = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6]
-]
-const board = document.getElementById('board')
-const cells = document.querySelectorAll('[data-cell]')
-const winningScreen = document.getElementById('winning-message')
-const winningText = document.querySelector('[data-winning-message-text]')
-const restart = document.getElementById('restart-button')
-let turn
+const createPlayer = name => {
+  const createMessage = () => console.log(`${name} is created`);
+  return { name, createMessage }
+}
+
+const playerOne = createPlayer('Juan')
+const playerTwo = createPlayer('Maria')
+
+game = {
+  win: [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6]
+  ],
+  screen: document.getElementById('winner'),
+  message: document.getElementById('message'),
+  restart: document.getElementById('restart'),
+  board: document.getElementById('board'),
+  cells: new Array(9),
+  turn: false,
+  letterHover: function() {
+    board.classList.remove(...board.classList)
+    if (game.turn) board.classList.add('O')
+    else board.classList.add('X')
+  },
+  addMark: function(cell, letter) {
+    cell.classList.add(letter)
+  },
+  changeTurn: function() {
+    game.turn = !game.turn
+    game.letterHover()  
+  },
+  checkWin: function(turn) {
+    return this.win.some(combination =>
+      combination.every(index =>
+        this.cells[index].classList.contains(turn)
+    ))
+  },
+  postGame: function(draw, letter = '') {
+    if (draw) message.innerText = 'Draw!'
+    else message.innerText = `${letter} wins!`
+    winner.classList.add('show')
+  },
+  drawGame: function() {
+    return [...game.cells].every(cell => cell.classList.contains('X') || cell.classList.contains('O'));
+  }
+}
+
+for (let i = 0; i < game.cells.length; i++) {
+  cell = document.createElement('div')
+  cell.classList.add('cell')
+  game.cells[i] = game.board.appendChild(cell)
+}
 
 startGame()
 
-restart.addEventListener('click', startGame)
+game.restart.addEventListener('click', startGame)
 
 function startGame() {
-  turn = false
-  cells.forEach(cell => {
-    cell.classList.remove(X)
-    cell.classList.remove(O)
-    cell.removeEventListener('click' ,handleClick)
-    cell.addEventListener('click', handleClick, { once: true })
-  })
-  setBoardHoverClass()
-  winningScreen.classList.remove('show')
+  game.turn = false
+  game.cells.forEach(cell => {
+    cell.classList.remove('X', 'O')
+    cell.addEventListener('click', clickHandler, { once: true })
+  }) 
+  game.letterHover()
+  game.screen.classList.remove('show')
 }
 
-function handleClick(event) {
-  const cell = event.target
-  const currentClass = turn ? O : X
-  placeMark(cell, currentClass)
-  if (checkWin(currentClass)) endGame(false)
-  else if (isDraw()) endGame(true)
-  else changeTurn()
-}
-
-function placeMark(cell, currentClass) {
-  cell.classList.add(currentClass)
-}
-
-function changeTurn() {
-  turn = !turn
-  setBoardHoverClass()
-}
-
-function setBoardHoverClass() {
- board.classList.remove(X)
- board.classList.remove(O)
- if (turn) board.classList.add(O)
- else board.classList.add(X)
-}
-
-function checkWin(currentClass) {
-  return win.some(combination => {
-    return combination.every(index => {
-      return cells[index].classList.contains(currentClass)
-    })
-  })
-}
-
-function endGame(draw) {
-  if (draw) winningText.innerText = 'Draw!'
-  else winningText.innerText = `${turn ? 'O' : 'X'} wins!`
-  winningScreen.classList.add('show')
-}
-
-function isDraw() {
-  return [...cells].every(cell => {
-    return cell.classList.contains(X) || cell.classList.contains(O)
-  })
+function clickHandler(e) {
+  const cell = e.target
+  const letter = game.turn ? 'O' : 'X'
+  game.addMark(cell, letter)
+  if (game.checkWin(letter)) game.postGame(false, letter)
+  else if (game.drawGame()) game.postGame(true)
+  else game.changeTurn()
 }
