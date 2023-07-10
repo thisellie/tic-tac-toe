@@ -8,7 +8,42 @@
   <title>Tic Tac Toe</title>
 </head>
 <body>
-  <section id="board"></section>
+  <header>
+    <h1 id="header">thisellie's Tic Tac Toe</h1>
+    <a href="https://github.com/thisellie"><img height="25px" width="25px" src="assets/github-mark.svg" alt="GitHub Invertocat Logo"></a>
+  </header>
+  <section id="display">
+    <select id="mode">
+      <option value="">Single player</option>
+      <option value="" selected="selected">Two players</option>
+    </select>
+    <div id="single">
+      <input type="button" value="X" id="X">
+      <input type="button" value="O" id="O">
+    </div>
+    <div id="versus">
+      <div>
+        <label for="">X Player</label>
+        <input type="text" name="" id="playerOne">
+      </div>
+      <div>
+        <label for="">O Player</label>
+        <input type="text" name="" id="playerTwo">
+      </div>
+    </div>
+    <button id="start">Start!</button>
+  </section>
+  <section id="board">
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+    <div class="cell"></div>
+  </section>
   <section id="winner">
     <h1>Game Over</h1>
     <p id="message"></p>

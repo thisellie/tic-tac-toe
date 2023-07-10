@@ -5,11 +5,75 @@
 
 body {
   margin: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+header h1 {
+  margin: 0;
+}
+
+select, input, button {
+  margin: 0;
+  border: 1px solid gray;
+  border-radius: 5px;
+  padding: 0 .5rem;
+  height: 1.5rem;
+}
+
+input[type="button"] {
+  width: 168px;
+}
+
+input[type="text"] {
+  height: 22px;
+}
+
+input[type="button"].selected {
+  background-color: #242424;
+  color: white;
+}
+
+
+#display {
+  height: 60px;
+  padding-bottom: 1.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+#display #single {
+  display: none;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+#display #versus {
+  display: none;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+#display div#versus div label {
+  display: block;
+  padding: 0.5rem 0;
 }
 
 #board {
-  width: 100vw;
-  height: 100vh;
   display: grid;
   grid-template-columns: repeat(3, auto);
   justify-content: center;
@@ -141,8 +205,8 @@ body {
   bottom: 0;
 }
 
-#winner.show {
-  display: flex;
+#single.show, #versus.show, #winner.show {
+  display: flex !important;
 }
 
 #winner button {
@@ -150,6 +214,7 @@ body {
   background-color: white;
   border: 1px solid black;
   padding: .25em .5em;
+  height: auto;
   cursor: pointer;
 }
 

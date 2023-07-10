@@ -1,13 +1,10 @@
-const createPlayer = name => {
-  const createMessage = () => console.log(`${name} is created`);
-  return { name, createMessage }
+const playerFactory = (name, mark) => {
+  return {name, mark}
 }
 
-const playerOne = createPlayer('Juan')
-const playerTwo = createPlayer('Maria')
+gameBoard = (() => {
 
-game = {
-  win: [
+  const combinations = [
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
@@ -16,66 +13,100 @@ game = {
     [2, 5, 8],
     [0, 4, 8],
     [2, 4, 6]
-  ],
-  screen: document.getElementById('winner'),
-  message: document.getElementById('message'),
-  restart: document.getElementById('restart'),
-  board: document.getElementById('board'),
-  cells: new Array(9),
-  turn: false,
-  letterHover: function() {
-    board.classList.remove(...board.classList)
-    if (game.turn) board.classList.add('O')
-    else board.classList.add('X')
-  },
-  addMark: function(cell, letter) {
-    cell.classList.add(letter)
-  },
-  changeTurn: function() {
-    game.turn = !game.turn
-    game.letterHover()  
-  },
-  checkWin: function(turn) {
-    return this.win.some(combination =>
-      combination.every(index =>
-        this.cells[index].classList.contains(turn)
-    ))
-  },
-  postGame: function(draw, letter = '') {
-    if (draw) message.innerText = 'Draw!'
-    else message.innerText = `${letter} wins!`
-    winner.classList.add('show')
-  },
-  drawGame: function() {
-    return [...game.cells].every(cell => cell.classList.contains('X') || cell.classList.contains('O'));
+  ]
+
+  const winner = document.getElementById('winner')
+  const message = document.getElementById('message')
+  const board = document.getElementById('board')
+  const cells = document.querySelectorAll('.cell')
+  const restartButton = document.getElementById('restart')
+  const startButton = document.getElementById('start')
+  const single = document.getElementById('single')
+  const versus = document.getElementById('versus')
+  const mode = document.getElementById('mode')
+  const X = document.getElementById('X')
+  const O = document.getElementById('O')
+  var playerOne, playerTwo
+
+  // FIXME: Sync select menu to the mode settings when refreshed
+  document.addEventListener('DOMContentLoaded', () => single.classList.add('show'))
+
+  X.addEventListener('click', () => {
+    if (!X.classList.contains('selected')) {
+      O.classList.remove('selected')
+      X.classList.add('selected')
+    } else X.classList.remove('selected')
+  })
+
+  O.addEventListener('click', () => {
+    if (!O.classList.contains('selected')) {
+      X.classList.remove('selected')
+      O.classList.add('selected')
+    } else O.classList.remove('selected')
+  })
+
+  // TODO: Reset and disable other mode when swapped
+  mode.addEventListener('change', () => {
+    if (mode.selectedIndex === 1) {
+      single.classList.remove('show')
+      versus.classList.add('show')
+    } else if (mode.selectedIndex === 0) {
+      versus.classList.remove('show')
+      single.classList.add('show')
+    }
+  })
+
+  // TODO: Add Feedback that the game starts
+  startButton.addEventListener('click', () => gameBoard.start())
+  // TODO: Option to change settings
+  restartButton.addEventListener('click', () => gameBoard.start())
+
+  function create() {
+    playerOne = playerFactory(document.getElementById('playerOne').value, 'X')
+    playerTwo = playerFactory(document.getElementById('playerTwo').value, 'O')
   }
-}
 
-for (let i = 0; i < game.cells.length; i++) {
-  cell = document.createElement('div')
-  cell.classList.add('cell')
-  game.cells[i] = game.board.appendChild(cell)
-}
+  // TODO: Create functions for single and versus mode
+  function start() {
+    create()
+    turn = true
+    cells.forEach(cell => {
+      cell.classList.remove('X', 'O')
+      cell.addEventListener('click', click, { once: true })
+    }) 
+    hover()
+    winner.classList.remove('show')
+  }
 
-startGame()
+  function hover() {
+    turn = !turn
+    board.classList.remove(...board.classList)
+    if (turn) board.classList.add('O')
+    else board.classList.add('X')
+  }
 
-game.restart.addEventListener('click', startGame)
+  function click(e) {
+    const cell = e.target
+    const letter = turn ? playerTwo.mark : playerOne.mark
+    cell.classList.add(letter)
+    if (check(letter)) post(false, letter)
+    else if (draw()) post(true)
+    else hover()
+  }
 
-function startGame() {
-  game.turn = false
-  game.cells.forEach(cell => {
-    cell.classList.remove('X', 'O')
-    cell.addEventListener('click', clickHandler, { once: true })
-  }) 
-  game.letterHover()
-  game.screen.classList.remove('show')
-}
+  const check = turn => combinations.some(combination => combination.every(index => cells[index].classList.contains(turn)))
 
-function clickHandler(e) {
-  const cell = e.target
-  const letter = game.turn ? 'O' : 'X'
-  game.addMark(cell, letter)
-  if (game.checkWin(letter)) game.postGame(false, letter)
-  else if (game.drawGame()) game.postGame(true)
-  else game.changeTurn()
-}
+  const draw = () => [...cells].every(cell => cell.classList.contains('X') || cell.classList.contains('O'))
+
+  function post(draw, letter) {
+    const name = (letter === playerOne.mark ? playerOne : playerTwo).name
+    if (draw) message.innerText = 'Draw!'
+    else message.innerText = `${name ? name : letter} wins!`
+    winner.classList.add('show')
+  }
+
+  return {start}
+  
+})()
+
+// TODO: Add minimax algorithm for single player
